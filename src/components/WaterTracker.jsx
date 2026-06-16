@@ -2,10 +2,10 @@
 
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getActiveUserId } from "@/lib/userClient";
+import useActiveUserId from "@/hooks/useActiveUserId";
 
 export default function WaterTracker() {
-  const USER_ID = getActiveUserId();
+  const USER_ID = useActiveUserId();
   const [consumed, setConsumed] = useState(1800);
   const [goal, setGoal] = useState(2500);
   const [status, setStatus] = useState("");

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getActiveUserId } from "@/lib/userClient";
+import useActiveUserId from "@/hooks/useActiveUserId";
 
 export default function ProfileSavedCard() {
-  const USER_ID = getActiveUserId();
+  const USER_ID = useActiveUserId();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -28,7 +28,7 @@ export default function ProfileSavedCard() {
     };
 
     fetchDashboard();
-  }, []);
+  }, [USER_ID]);
 
   if (loading) {
     return (

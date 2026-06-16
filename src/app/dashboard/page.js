@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import BottomNav from "@/components/BottomNav";
-import { getActiveUserId } from "@/lib/userClient";
+import useActiveUserId from "@/hooks/useActiveUserId";
 import CalorieRing from "@/components/CalorieRing";
 import AIInsightCard from "@/components/AIInsightCard";
 import NutritionCard from "@/components/NutritionCard";
@@ -12,9 +12,8 @@ import MealSuggestionCard from "@/components/MealSuggestionCard";
 import WaterTracker from "@/components/WaterTracker";
 import ProfileSavedCard from "@/components/ProfileSavedCard";
 
-const USER_ID = getActiveUserId();
-
 export default function DashboardPage() {
+  const USER_ID = useActiveUserId();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +33,7 @@ export default function DashboardPage() {
     };
 
     fetchDashboard();
-  }, []);
+  }, [USER_ID]);
 
   const dashboard = data?.dashboard || {};
   const targets = data?.targets || { calories: 2000, protein: 110, carbs: 250, fat: 65, water: 2500 };

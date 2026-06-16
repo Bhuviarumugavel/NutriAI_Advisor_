@@ -2,10 +2,10 @@
 
 import { Camera, FileText } from "lucide-react";
 import { useState } from "react";
-import { getActiveUserId } from "@/lib/userClient";
+import useActiveUserId from "@/hooks/useActiveUserId";
 
 export default function MealPlanPrompt() {
-  const USER_ID = getActiveUserId();
+  const USER_ID = useActiveUserId();
   const [foodText, setFoodText] = useState("");
   const [mealType, setMealType] = useState("breakfast");
   const [imageFile, setImageFile] = useState(null);
