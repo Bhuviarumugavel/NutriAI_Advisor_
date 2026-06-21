@@ -13,6 +13,8 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email");
     const userId = searchParams.get("userId");
+    const localHourParam = searchParams.get("localHour");
+    const localHour = localHourParam !== null ? parseInt(localHourParam, 10) : new Date().getHours();
 
     const dashboard = email
       ? await getDashboardDataByEmail(email.toLowerCase())
@@ -29,7 +31,7 @@ export async function GET(req) {
     // AI-powered personalized suggestion based on profile
     let aiSuggestion = null;
     try {
-      aiSuggestion = await generateMealSuggestion(dashboard.profile, dashboard);
+      aiSuggestion = await generateMealSuggestion(dashboard.profile, dashboard, localHour);
     } catch (err) {
       console.error("AI suggestion error:", err.message);
     }

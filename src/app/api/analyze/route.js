@@ -8,6 +8,7 @@ export async function POST(req) {
     let email = null;
     let userId = "demo-user";
     let analysis = null;
+    let localHour = new Date().getHours();
 
     if (contentType.includes("multipart/form-data")) {
       const formData = await req.formData();
@@ -15,6 +16,10 @@ export async function POST(req) {
       const foodText = formData.get("food") || "";
       email = formData.get("email");
       userId = formData.get("userId") || "demo-user";
+      const localHourParam = formData.get("localHour");
+      if (localHourParam !== null) {
+        localHour = parseInt(localHourParam, 10);
+      }
 
       if (file && file.size > 0) {
         const buffer = Buffer.from(await file.arrayBuffer());
@@ -28,6 +33,9 @@ export async function POST(req) {
       const body = await req.json();
       email = body.email;
       userId = body.userId || "demo-user";
+      if (body.localHour !== undefined) {
+        localHour = parseInt(body.localHour, 10);
+      }
       
       if (body.food) {
         analysis = await analyzeMealText(body.food);
@@ -61,7 +69,7 @@ export async function POST(req) {
       carbs: (dashboardData?.carbs || 0) + (analysis.carbs || 0),
       fat: (dashboardData?.fat || 0) + (analysis.fat || 0),
       water: dashboardData?.water || 0
-    });
+    }, localHour);
 
     return NextResponse.json({
       success: true,

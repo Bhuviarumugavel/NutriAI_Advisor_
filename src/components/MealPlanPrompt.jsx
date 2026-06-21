@@ -47,6 +47,7 @@ export default function MealPlanPrompt({ onAnalysisComplete }) {
         formData.append("email", USER_EMAIL);
       }
       formData.append("userId", USER_ID);
+      formData.append("localHour", new Date().getHours().toString());
 
       const analyzeResponse = await fetch("/api/analyze", {
         method: "POST",

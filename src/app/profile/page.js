@@ -14,7 +14,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const response = await fetch(`/api/dashboard?userId=${userId}`);
+        const localHour = new Date().getHours();
+        const response = await fetch(`/api/dashboard?userId=${userId}&localHour=${localHour}`);
         const result = await response.json();
         if (result.success) {
           setData(result);

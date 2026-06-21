@@ -20,7 +20,8 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await fetch(`/api/dashboard?userId=${USER_ID}`);
+        const localHour = new Date().getHours();
+        const response = await fetch(`/api/dashboard?userId=${USER_ID}&localHour=${localHour}`);
         const result = await response.json();
         if (result.success) {
           setData(result);
@@ -32,7 +33,9 @@ export default function DashboardPage() {
       }
     };
 
-    fetchDashboard();
+    if (USER_ID) {
+      fetchDashboard();
+    }
   }, [USER_ID]);
 
   const dashboard = data?.dashboard || {};
