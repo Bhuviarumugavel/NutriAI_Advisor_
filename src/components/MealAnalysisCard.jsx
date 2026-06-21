@@ -1,10 +1,10 @@
-﻿export default function MealAnalysisCard({ analysis, suggestion }) {
-  const title = analysis?.food || "Grilled Chicken Salad";
-  const calories = analysis?.calories ?? 350;
-  const protein = analysis?.protein ?? 24;
-  const carbs = analysis?.carbs ?? 15;
-  const fat = analysis?.fat ?? 12;
-  const fiber = analysis?.fiber ?? 4;
+export default function MealAnalysisCard({ analysis, suggestion }) {
+  const title = analysis?.food || "No meal analyzed yet";
+  const calories = analysis?.calories ?? 0;
+  const protein = analysis?.protein ?? 0;
+  const carbs = analysis?.carbs ?? 0;
+  const fat = analysis?.fat ?? 0;
+  const fiber = analysis?.fiber ?? 0;
 
   return (
     <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
@@ -16,7 +16,7 @@
         <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-700">{calories} kcal</span>
       </div>
 
-      <p className="text-slate-500 mt-4">{suggestion || "Estimated nutritional values based on image and description."}</p>
+      <p className="text-slate-500 mt-4">{suggestion || "Analyze a meal to estimate nutritional values."}</p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <div className="rounded-3xl bg-slate-50 px-4 py-3 text-sm text-slate-700">

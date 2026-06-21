@@ -61,7 +61,7 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid gap-4 sm:grid-cols-4">
               <div className="rounded-3xl bg-slate-50 p-5">
                 <p className="text-sm text-slate-500">Calories left</p>
                 <p className="mt-3 text-3xl font-bold text-slate-900">
@@ -78,6 +78,12 @@ export default function DashboardPage() {
                 <p className="text-sm text-slate-500">Hydration</p>
                 <p className="mt-3 text-3xl font-bold text-slate-900">
                   {loading ? "..." : `${(waterConsumed / 1000).toFixed(1)}L`}
+                </p>
+              </div>
+              <div className="rounded-3xl bg-emerald-50 p-5 border border-emerald-100">
+                <p className="text-sm text-emerald-800 font-semibold">Health Score</p>
+                <p className="mt-3 text-3xl font-bold text-emerald-700">
+                  {loading ? "..." : (data?.healthScore || 75)}
                 </p>
               </div>
             </div>
@@ -121,7 +127,7 @@ export default function DashboardPage() {
 
         <section className="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
           <h2 className="text-2xl font-bold text-slate-900 mb-5">Weekly Trends</h2>
-          <WeeklyTrendChart />
+          <WeeklyTrendChart weeklyData={data?.dashboard?.weeklyData} />
         </section>
       </main>
 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Plus, Minus } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -6,8 +6,9 @@ import useActiveUserId from "@/hooks/useActiveUserId";
 
 export default function WaterTracker() {
   const USER_ID = useActiveUserId();
-  const [consumed, setConsumed] = useState(1800);
+  const [consumed, setConsumed] = useState(0);
   const [goal, setGoal] = useState(2500);
+  const [bottleSize, setBottleSize] = useState(500);
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -18,11 +19,30 @@ export default function WaterTracker() {
         if (typeof parsed.total === "number") {
           setGoal(parsed.total);
         }
+        if (typeof parsed.bottleMl === "number") {
+          setBottleSize(parsed.bottleMl);
+        }
       } catch (error) {
         // ignore parse error
       }
     }
-  }, []);
+    
+    // Also load currently logged water if any
+    const fetchWater = async () => {
+      try {
+        const response = await fetch(`/api/dashboard?userId=${USER_ID}`);
+        const result = await response.json();
+        if (result.success && result.dashboard) {
+          setConsumed(result.dashboard.water || 0);
+        }
+      } catch (err) {
+        console.error("Failed to load water:", err);
+      }
+    };
+    if (USER_ID) {
+      fetchWater();
+    }
+  }, [USER_ID]);
 
   const progress = Math.round((consumed / goal) * 100);
 
@@ -73,23 +93,34 @@ export default function WaterTracker() {
 
       {status && <p className="mt-4 rounded-3xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{status}</p>}
 
-      <div className="mt-6 grid grid-cols-2 gap-4">
+      <div className="mt-6 space-y-4">
         <button
           type="button"
-          onClick={() => updateConsumed(-100)}
-          className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-red-50 px-4 py-3 text-slate-700 transition hover:bg-red-100"
+          onClick={() => updateConsumed(bottleSize)}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-3xl bg-emerald-600 px-4 py-4 text-white font-semibold transition hover:bg-emerald-700 shadow-md transform hover:scale-[1.02] duration-200"
         >
-          <Minus />
-          Remove 100ml
+          <Plus size={20} />
+          Quick Log 1 Bottle ({bottleSize}ml)
         </button>
-        <button
-          type="button"
-          onClick={() => updateConsumed(100)}
-          className="inline-flex items-center justify-center gap-2 rounded-3xl bg-emerald-600 px-4 py-3 text-white transition hover:bg-emerald-700"
-        >
-          <Plus />
-          Add 100ml
-        </button>
+
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => updateConsumed(-100)}
+            className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-red-50 px-4 py-3 text-slate-700 transition hover:bg-red-100"
+          >
+            <Minus size={16} />
+            Remove 100ml
+          </button>
+          <button
+            type="button"
+            onClick={() => updateConsumed(100)}
+            className="inline-flex items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-emerald-50 px-4 py-3 text-slate-700 transition hover:bg-emerald-100"
+          >
+            <Plus size={16} />
+            Add 100ml
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -4,19 +4,21 @@ export function getActiveUserId() {
   if (typeof window === "undefined") {
     return DEFAULT_USER_ID;
   }
-  const storedId = window.localStorage.getItem("nutriActiveUserId");
-  return storedId?.trim() || DEFAULT_USER_ID;
+  const stored = window.localStorage.getItem("nutriActiveUserEmail");
+  return stored?.trim() || DEFAULT_USER_ID;
 }
 
-export function setActiveUserId(userId) {
+export function setActiveUserId(userEmail) {
   if (typeof window === "undefined") {
     return;
   }
-  if (!userId) {
-    window.localStorage.removeItem("nutriActiveUserId");
+  if (!userEmail) {
+    window.localStorage.removeItem("nutriActiveUserEmail");
+    window.dispatchEvent(new Event("nutriActiveUserIdChanged"));
     return;
   }
-  window.localStorage.setItem("nutriActiveUserId", userId.trim());
+  window.localStorage.setItem("nutriActiveUserEmail", userEmail.trim());
+  window.dispatchEvent(new Event("nutriActiveUserIdChanged"));
 }
 
 export function normalizeHealthConditions(value) {

@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
-import { saveWater } from "@/lib/excel";
+import { saveWater, saveWaterByEmail } from "@/lib/db";
 
 export async function POST(req) {
   try {
     const body = await req.json();
 
-    if (!body.userId) {
+    if (!body.userId && !body.email) {
       return NextResponse.json(
-        { success: false, error: "userId is required" },
+        { success: false, error: "email or userId is required" },
         { status: 400 }
       );
     }
 
-    await saveWater(body);
+    if (body.email) {
+      await saveWaterByEmail(body);
+    } else {
+      await saveWater(body);
+    }
 
     return NextResponse.json({
       success: true,

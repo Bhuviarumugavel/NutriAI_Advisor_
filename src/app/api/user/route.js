@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createUserSheet } from "@/lib/excel";
+import { createUserSheet } from "@/lib/db";
 
 export async function POST(req) {
   try {
@@ -10,6 +10,11 @@ export async function POST(req) {
         { success: false, error: "userId is required" },
         { status: 400 }
       );
+    }
+
+    // If the supplied userId looks like an email, ensure we also persist it as email
+    if (!body.email && typeof body.userId === "string" && body.userId.includes("@")) {
+      body.email = body.userId.toLowerCase();
     }
 
     await createUserSheet(body);

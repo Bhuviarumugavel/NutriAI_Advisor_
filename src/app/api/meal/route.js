@@ -1,18 +1,23 @@
 import { NextResponse } from "next/server";
-import { saveMeal } from "@/lib/excel";
+import { saveMeal, saveMealByEmail } from "@/lib/db";
 
 export async function POST(req) {
   try {
     const body = await req.json();
 
-    if (!body.userId) {
+    // Support both legacy userId and new email
+    if (!body.userId && !body.email) {
       return NextResponse.json(
-        { success: false, error: "userId is required" },
+        { success: false, error: "email or userId is required" },
         { status: 400 }
       );
     }
 
-    await saveMeal(body);
+    if (body.email) {
+      await saveMealByEmail(body);
+    } else {
+      await saveMeal(body);
+    }
 
     return NextResponse.json({
       success: true,

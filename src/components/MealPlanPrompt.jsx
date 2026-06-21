@@ -4,8 +4,9 @@ import { Camera, FileText } from "lucide-react";
 import { useState } from "react";
 import useActiveUserId from "@/hooks/useActiveUserId";
 
-export default function MealPlanPrompt() {
+export default function MealPlanPrompt({ onAnalysisComplete }) {
   const USER_ID = useActiveUserId();
+  const USER_EMAIL = typeof window !== "undefined" ? window.localStorage.getItem("nutriActiveUserEmail") : null;
   const [foodText, setFoodText] = useState("");
   const [mealType, setMealType] = useState("breakfast");
   const [imageFile, setImageFile] = useState(null);
@@ -35,15 +36,21 @@ export default function MealPlanPrompt() {
       setAnalyzing(true);
       setStatus("Analyzing meal with AI...");
 
-      const analyzeBody = {
-        food: foodText.trim() || (imageFile ? imageFile.name : "Meal upload"),
-        userId: USER_ID
-      };
+      const formData = new FormData();
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+      if (foodText.trim()) {
+        formData.append("food", foodText.trim());
+      }
+      if (USER_EMAIL) {
+        formData.append("email", USER_EMAIL);
+      }
+      formData.append("userId", USER_ID);
 
       const analyzeResponse = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(analyzeBody)
+        body: formData
       });
 
       const analyzeData = await analyzeResponse.json();
@@ -52,23 +59,38 @@ export default function MealPlanPrompt() {
         throw new Error(analyzeData.error || "Meal analysis failed.");
       }
 
+      if (analyzeData.unclear) {
+        setError("The AI was unable to identify the food items in your image. Please describe the meal details manually in the field below.");
+        setStatus("");
+        setAnalyzing(false);
+        return;
+      }
+
       setAnalysis(analyzeData.analysis);
       setSuggestion(analyzeData.suggestion);
+      
+      if (typeof onAnalysisComplete === "function") {
+        onAnalysisComplete(analyzeData);
+      }
+
       setStatus("Saving meal to workbook...");
+
+      const savePayload = {
+        mealType,
+        food: analyzeData.analysis.food || foodText.trim() || "Meal upload",
+        calories: analyzeData.analysis.calories,
+        protein: analyzeData.analysis.protein,
+        carbs: analyzeData.analysis.carbs,
+        fat: analyzeData.analysis.fat,
+        fiber: analyzeData.analysis.fiber
+      };
+      if (USER_EMAIL) savePayload.email = USER_EMAIL;
+      else savePayload.userId = USER_ID;
 
       const saveResponse = await fetch("/api/meal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: USER_ID,
-          mealType,
-          food: analyzeData.analysis.food || analyzeBody.food,
-          calories: analyzeData.analysis.calories,
-          protein: analyzeData.analysis.protein,
-          carbs: analyzeData.analysis.carbs,
-          fat: analyzeData.analysis.fat,
-          fiber: analyzeData.analysis.fiber
-        })
+        body: JSON.stringify(savePayload)
       });
 
       const saveData = await saveResponse.json();

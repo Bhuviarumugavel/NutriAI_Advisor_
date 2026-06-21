@@ -1,21 +1,26 @@
 import { NextResponse } from "next/server";
-import { getDashboardData } from "@/lib/excel";
+import { getDashboardData, getDashboardDataByEmail } from "@/lib/db";
 import { generateMealSuggestion } from "@/lib/gemini";
 import {
   DAILY_TARGETS,
   generateNutritionSummary,
-  generateMealRecommendation
+  generateMealRecommendation,
+  calculateWellnessScore
 } from "@/lib/nutrition";
 
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId") || "demo-user";
+    const email = searchParams.get("email");
+    const userId = searchParams.get("userId");
 
-    const dashboard = await getDashboardData(userId);
+    const dashboard = email
+      ? await getDashboardDataByEmail(email.toLowerCase())
+      : await getDashboardData(userId || "demo-user");
+
     const summary = generateNutritionSummary({
       ...dashboard,
-      water: dashboard.water || 0
+      water: dashboard?.water || 0
     });
 
     // Basic rule-based suggestion
@@ -29,13 +34,16 @@ export async function GET(req) {
       console.error("AI suggestion error:", err.message);
     }
 
+    const healthScore = calculateWellnessScore(dashboard);
+
     return NextResponse.json({
       success: true,
       targets: DAILY_TARGETS,
       dashboard,
       summary,
       suggestion: basicSuggestion,
-      aiSuggestion
+      aiSuggestion,
+      healthScore
     });
 
   } catch (error) {
