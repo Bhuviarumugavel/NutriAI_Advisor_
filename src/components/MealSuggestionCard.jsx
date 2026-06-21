@@ -99,6 +99,8 @@ export default function MealSuggestionCard() {
   const proteinPercent = Math.min(Math.round((protein / proteinTarget) * 100), 100);
   const waterPercent = Math.min(Math.round((water / waterTarget) * 100), 100);
 
+  const hasNoMeals = !dashboard?.meals || dashboard.meals.length === 0;
+
   return (
     <div className="bg-white rounded-3xl p-6 shadow-lg border border-slate-200">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -122,9 +124,27 @@ export default function MealSuggestionCard() {
         </div>
       </div>
 
-      <p className="mt-6 text-slate-500">
-        {loading ? "Loading suggestions..." : error ? error : getHealthSuggestion(dashboard?.profile)}
-      </p>
+      <div className="mt-6 text-slate-600 leading-relaxed text-sm">
+        {loading ? (
+          "Loading suggestions..."
+        ) : error ? (
+          <span className="text-red-500">{error}</span>
+        ) : (
+          <>
+            {dashboard?.profile?.name && (
+              <span className="font-bold text-slate-900 block mb-1">
+                Hello, {dashboard.profile.name}!
+              </span>
+            )}
+            {getHealthSuggestion(dashboard?.profile)}
+            {hasNoMeals && (
+              <span className="text-emerald-700 font-semibold block mt-3 bg-emerald-50 border border-emerald-100 rounded-2xl p-3">
+                📢 Reminder: You haven't logged any meals yet today. Please remember to update your meal inputs regularly in the 'AI Meal' tab so we can customize your dietician advice!
+              </span>
+            )}
+          </>
+        )}
+      </div>
 
       <ul className="mt-5 space-y-3">
         {suggestionsForSegment.map((item) => (

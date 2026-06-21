@@ -10,8 +10,11 @@ export default function AIInsightCard({ protein = 0, targetProtein = 110, aiSugg
     <div className="bg-emerald-50 rounded-3xl p-6 shadow-lg border border-emerald-100">
       <div className="flex items-center justify-between gap-4">
         <div>
+          {aiSuggestion?.greeting && (
+            <p className="text-sm font-semibold text-emerald-800 mb-1">{aiSuggestion.greeting}</p>
+          )}
           <p className="text-sm uppercase tracking-[0.3em] text-emerald-700">AI Insight</p>
-          <h3 className="text-2xl font-bold text-slate-900">
+          <h3 className="text-2xl font-bold text-slate-900 mt-1">
             {hasAISuggestion ? aiSuggestion.mealName : "Smart nutrition suggestion"}
           </h3>
         </div>
